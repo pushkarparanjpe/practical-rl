@@ -2,10 +2,10 @@
   Ref.: https://pythonprogramming.net/q-learning-reinforcement-learning-python-tutorial/
 
 
-  # Notes:
-    # action = 0  # PUSH LEFT
-    # action = 1  # DO NOTHING
-    # action = 2  # PUSH RIGHT
+  Notes:
+    action = 0  # PUSH LEFT
+    action = 1  # DO NOTHING
+    action = 2  # PUSH RIGHT
 
 '''
 
@@ -70,19 +70,18 @@ stats = {'ep': [], 'min': [], 'avg': [], 'max': []}
 # Loop over all episodes
 for episode in range(EPISODES):
   # Rendering is expensive, don't render every episode,
-  # only render every SHOW_EVERY'th episode
+  #   only render every SHOW_EVERY'th episode
   if episode % SHOW_EVERY == 0:
     render = True
     print(episode)
   else:
     render = False
 
-
-  # Init : places the agent in the env
+  # A. Default Init : places the agent in the env
   #        at a random position and having random velocity
   discrete_state = get_discrete_state(env.reset())
 
-  # # Override the init to always start the agent in a fixed state
+  # # B. Override the default init to always start the agent in a fixed state
   # discrete_state = get_discrete_state(np.array([-0.4, 0]))
   # env.env.state = np.array([-0.4, 0])
 
@@ -94,23 +93,23 @@ for episode in range(EPISODES):
   # Loop over all steps of this episode
   while not done:
 
-    # Scheduled epsilon-greedy strategy
+    # A. Scheduled epsilon-greedy strategy
     if np.random.random() > epsilon:
       # [EXPLOIT]
       # Choose the best action for
-      #  this particular discrete state
+      #   this particular discrete state
       action = np.argmax(q_table[discrete_state])
     else:
       # [EXPLORE]
       # Choose a random action
       action = np.random.randint(0, env.action_space.n)
 
-    # # Always greedy strategy
+    # # B. Always greedy strategy
     # action = np.argmax(q_table[discrete_state])
 
 
     # Step the env to get:
-    # a new state, a reward, a episode done status, etc.
+    #  a new state, a reward, an episode done status, etc.
     new_state, reward, done, _ = env.step(action)
 
     # Accumulate reward for stats
@@ -127,14 +126,17 @@ for episode in range(EPISODES):
       # Collect total total reward for this episode for stats
       achieved_rewards.append(episode_reward)
 
-
     # The episode did not complete even after this step
     elif not done:
-      # Max possible Q value by actioning from the future state
-      max_future_q = np.max(q_table[new_discrete_state])
+
+      # Bunch of calculations leading up to Q-table update ...
+      # ------------------------------------------------------
 
       # Current Q value for this particular state and the taken action
       current_q = q_table[discrete_state + (action,)]
+
+      # Max possible Q value by actioning from the future state
+      max_future_q = np.max(q_table[new_discrete_state])
 
       # Calculate the new Q value for this particular state and the taken action
       # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
@@ -150,7 +152,7 @@ for episode in range(EPISODES):
       #   update the q_table
       q_table[discrete_state + (action,)] = 0
 
-
+    # Update the current state var to the newly acquired discrete state
     discrete_state = new_discrete_state
 
 
@@ -168,6 +170,7 @@ for episode in range(EPISODES):
   # Decay the epsilon
   if START_EPSILON_DECAYING <= episode <= END_EPSILON_DECAYING:
     epsilon -= episilon_decay_value
+
 
 # Close the gym env
 env.close()
