@@ -88,6 +88,7 @@ for episode in range(EPISODES):
   # Variable to indicate: Has the episode completed ?
   done = False
 
+  # Init the episode reward to 0
   episode_reward = 0
 
   # Loop over all steps of this episode
@@ -141,7 +142,7 @@ for episode in range(EPISODES):
       # Calculate the new Q value for this particular state and the taken action
       # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
       new_q = (1 - LEARNING_RATE) * current_q \
-          + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
+            + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
 
       # Update the q_table
       q_table[discrete_state + (action,)] = new_q
