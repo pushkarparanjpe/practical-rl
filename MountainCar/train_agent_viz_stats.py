@@ -126,13 +126,15 @@ for episode in range(EPISODES):
     if render:
       env.render()
 
+
+    # Determine the updated Q-value for (current state, chosen action)
+    # ----------------------------------------------------------------
+
     # Unpack the new_state
     pos, vel = new_state
 
     # MountainCar did not reach the goal flag
     if pos < env.goal_position:
-      # Bunch of calculations leading up to Q-table update ...
-      # ------------------------------------------------------
 
       # Current Q value for this particular state and the taken action
       current_q = q_table[discrete_state + (action,)]
@@ -145,15 +147,13 @@ for episode in range(EPISODES):
       new_q = (1 - LEARNING_RATE) * current_q \
             + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
 
-      # Update the q_table
-      q_table[discrete_state + (action,)] = new_q
-
     # MountainCar made it to / past the goal flag !
     else:
       # We got the max possible reward (at any step) i.e. 0
-      #   update the q_table
-      q_table[discrete_state + (action,)] = 0
+      new_q = 0
 
+    # Update the q_table
+    q_table[discrete_state + (action,)] = new_q
 
     if done:
       # Collect total total reward for this episode for stats
