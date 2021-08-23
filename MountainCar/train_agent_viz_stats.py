@@ -30,14 +30,16 @@ DISCRETE_WINDOW_SIZES = (
 ) / DISCRETE_BUCKET_SIZES
 print("OBS BUCKETS WINDOW SIZES", DISCRETE_WINDOW_SIZES)
 
+
 # Q-Learning settings
 LEARNING_RATE = 0.1
 DISCOUNT = 0.95
 EPISODES = 10_000
 
+
 # Exploration settings
 # In initial episodes, epsilon has a high value --> low probability greedy-action-selection
-# But in later episodes, epsilon will have a low value --> high probability of greedy-action-selection
+#   But in later episodes, epsilon will have a low value --> high probability of greedy-action-selection
 epsilon = 1
 START_EPSILON_DECAYING = 1
 END_EPSILON_DECAYING = EPISODES//2
@@ -69,6 +71,7 @@ stats = {'ep': [], 'min': [], 'avg': [], 'max': []}
 
 # Loop over all episodes
 for episode in range(EPISODES):
+
   # Rendering is expensive, don't render every episode,
   #   only render every SHOW_EVERY'th episode
   if episode % SHOW_EVERY == 0:
@@ -78,7 +81,7 @@ for episode in range(EPISODES):
     render = False
 
   # A. Default Init : places the agent in the env
-  #        at a random position and having random velocity
+  #      at a random position and having random velocity
   discrete_state = get_discrete_state(env.reset())
 
   # # B. Override the default init to always start the agent in a fixed state
@@ -110,7 +113,7 @@ for episode in range(EPISODES):
 
 
     # Step the env to get:
-    #  a new state, a reward, an episode done status, etc.
+    #   a new state, a reward, an episode done status, etc.
     new_state, reward, done, _ = env.step(action)
 
     # Accumulate reward for stats
@@ -122,7 +125,6 @@ for episode in range(EPISODES):
     # Render if it is the SHOW_EVERY'th episode
     if render:
       env.render()
-
 
     # Unpack the new_state
     pos, vel = new_state
