@@ -16,8 +16,8 @@ from matplotlib import pyplot as plt
 
 
 
+# Create the gym environment for the "MountainCar" task
 env = gym.make("MountainCar-v0")
-
 print("HIGH", env.observation_space.high)
 print("LOW", env.observation_space.low)
 print("n actions", type(env.action_space.n))
