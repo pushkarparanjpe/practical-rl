@@ -123,13 +123,12 @@ for episode in range(EPISODES):
     if render:
       env.render()
 
-    if done:
-      # Collect total total reward for this episode for stats
-      achieved_rewards.append(episode_reward)
 
-    # The episode did not complete even after this step
-    elif not done:
+    # Unpack the new_state
+    pos, vel = new_state
 
+    # MountainCar did not reach the goal flag
+    if pos < env.goal_position:
       # Bunch of calculations leading up to Q-table update ...
       # ------------------------------------------------------
 
@@ -147,11 +146,17 @@ for episode in range(EPISODES):
       # Update the q_table
       q_table[discrete_state + (action,)] = new_q
 
-    # MountainCar made it / or made it past the goal flag !
-    elif new_state[0] >= env.goal_position:
+    # MountainCar made it to / past the goal flag !
+    else:
       # We got the max possible reward (at any step) i.e. 0
       #   update the q_table
       q_table[discrete_state + (action,)] = 0
+
+
+    if done:
+      # Collect total total reward for this episode for stats
+      achieved_rewards.append(episode_reward)
+
 
     # Update the current state var to the newly acquired discrete state
     discrete_state = new_discrete_state
