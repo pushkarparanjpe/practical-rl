@@ -43,6 +43,7 @@ END_EPSILON_DECAYING = EPISODES//2
 episilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
 
 
+# Randomly init the Q-table
 q_table = np.random.uniform(
 	low=-2, high=0,
 	size=(*DISCRETE_BUCKET_SIZES, env.action_space.n)
@@ -50,6 +51,7 @@ q_table = np.random.uniform(
 print("Q Table shape: ", q_table.shape)
 
 
+# Helper function that discreti-ses conituous state values to discrete values
 def get_discrete_state(state):
 	discrete_state = (
 		state - env.observation_space.low
@@ -57,15 +59,14 @@ def get_discrete_state(state):
 	return tuple(discrete_state.astype(np.int32))
 
 
+# Settings, accessories for rendering, stats
 SHOW_EVERY = 1000
 STATS_EVERY = 100
-
 achieved_rewards = deque(maxlen=STATS_EVERY)
 stats = {'ep': [], 'min': [], 'avg': [], 'max': []}
 
-FREEZE_Q_TABLE = False
 
-
+# Loop over all episodes
 for episode in range(EPISODES):
 	# Rendering is expensive, don't render every episode,
 	#	only render every SHOW_EVERY'th episode
@@ -89,7 +90,7 @@ for episode in range(EPISODES):
 
 	episode_reward = 0
 
-	# Loop until episode is not completed
+	# Loop over all steps of this episode
 	while not done:
 
 		# Scheduled epsilon-greedy strategy
@@ -152,6 +153,7 @@ for episode in range(EPISODES):
 		discrete_state = new_discrete_state
 
 
+	# Agg stats
 	if episode % STATS_EVERY == 0:
 		stats['ep'].append(episode)
 		min_ = np.min(achieved_rewards)
@@ -166,10 +168,11 @@ for episode in range(EPISODES):
 	if START_EPSILON_DECAYING <= episode <= END_EPSILON_DECAYING:
 		epsilon -= episilon_decay_value
 
+# Close the gym env
 env.close()
 
 
-# Viz metrics
+# Viz stats
 plt.plot(stats['ep'], stats['min'], label='min rewards')
 plt.plot(stats['ep'], stats['max'], label='max rewards')
 plt.plot(stats['ep'], stats['avg'], label='avg rewards')
