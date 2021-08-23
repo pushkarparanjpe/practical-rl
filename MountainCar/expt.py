@@ -27,7 +27,7 @@ class BaseExperiment(object):
   # Settings for Q-Learning
   LEARNING_RATE = 0.1
   DISCOUNT = 0.95
-  EPISODES = 10_00
+  EPISODES = 10_000
 
   # Settings for rendering, stats
   SHOW_EVERY = 1000
@@ -176,7 +176,11 @@ class BaseExperiment(object):
   def loop_over_episodes(self):
     # Loop over all episodes
     for episode in range(self.EPISODES):
+      # Decay the epsilon
+      if self.START_EPSILON_DECAYING <= episode <= self.END_EPSILON_DECAYING:
+        self.epsilon -= self.EPSILON_DECAY_VALUE
 
+      # Run the intra-episode loop
       self.loop_over_steps(episode)
 
       # Agg stats
@@ -190,9 +194,6 @@ class BaseExperiment(object):
         self.stats['avg'].append(avg_)
         print(f"Stats: ep {episode} , min {min_} , max {max_} , avg {avg_}")
 
-      # Decay the epsilon
-      if self.START_EPSILON_DECAYING <= episode <= self.END_EPSILON_DECAYING:
-        self.epsilon -= self.EPSILON_DECAY_VALUE
 
     # Close the gym env
     self.env.close()
