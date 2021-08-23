@@ -23,6 +23,7 @@ print("LOW", env.observation_space.low)
 print("n actions", type(env.action_space.n))
 
 
+# Settings for discreti-sing the observed continuous state values
 DISCRETE_BUCKET_SIZES = [20, 20]
 DISCRETE_WINDOW_SIZES = (
 	env.observation_space.high - env.observation_space.low
@@ -51,7 +52,7 @@ q_table = np.random.uniform(
 print("Q Table shape: ", q_table.shape)
 
 
-# Helper function that discreti-ses conituous state values to discrete values
+# Helper function that discreti-ses continuous state values to discrete values
 def get_discrete_state(state):
 	discrete_state = (
 		state - env.observation_space.low
