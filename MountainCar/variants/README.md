@@ -12,3 +12,6 @@ HighLearningRateExpt
 
 LowLearningRateExpt  
 ![LowLearningRateExpt](stats_LowLearningRateExpt.png)
+
+LowDiscountingExpt  
+![LowDiscountingExpt](stats_LowDiscountingExpt.png)
