@@ -15,7 +15,7 @@ class BaseExperiment(object):
       action = 2  # PUSH RIGHT
 
   '''
-  
+
   # Settings :
   # ----------
 
@@ -25,7 +25,7 @@ class BaseExperiment(object):
   # Settings for Q-Learning
   LEARNING_RATE = 0.1
   DISCOUNT = 0.95
-  EPISODES = 10_000
+  EPISODES = 10_00
 
   # Settings for rendering, stats
   SHOW_EVERY = 1000
@@ -77,15 +77,7 @@ class BaseExperiment(object):
     return tuple(discrete_state.astype(np.int32))
 
 
-  def loop_over_steps(self, episode):
-    # Rendering is expensive, don't render every episode,
-    #   only render every SHOW_EVERY'th episode
-    if episode % self.SHOW_EVERY == 0:
-      render = True
-      print(episode)
-    else:
-      render = False
-
+  def init_episode_state(self):
     # A. Default Init : places the agent in the env
     #      at a random position and having random velocity
     discrete_state = self.get_discrete_state(self.env.reset())
@@ -93,6 +85,21 @@ class BaseExperiment(object):
     # A+B. Override the default init to always start the agent in a fixed state
     discrete_state = self.get_discrete_state(np.array([-0.4, 0]))
     self.env.env.state = np.array([-0.4, 0])
+
+    return discrete_state
+
+
+  def loop_over_steps(self, episode):
+
+    discrete_state = self.init_episode_state()
+
+    # Rendering is expensive, don't render every episode,
+    #   only render every SHOW_EVERY'th episode
+    if episode % self.SHOW_EVERY == 0:
+      render = True
+      print(episode)
+    else:
+      render = False
 
     # Variable to indicate: Has the episode completed ?
     done = False
