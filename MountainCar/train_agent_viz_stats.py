@@ -69,124 +69,127 @@ achieved_rewards = deque(maxlen=STATS_EVERY)
 stats = {'ep': [], 'min': [], 'avg': [], 'max': []}
 
 
-# Loop over all episodes
-for episode in range(EPISODES):
 
-  # Rendering is expensive, don't render every episode,
-  #   only render every SHOW_EVERY'th episode
-  if episode % SHOW_EVERY == 0:
-    render = True
-    print(episode)
-  else:
-    render = False
 
-  # A. Default Init : places the agent in the env
-  #      at a random position and having random velocity
-  discrete_state = get_discrete_state(env.reset())
+if __name__=='__main__':
+  # Loop over all episodes
+  for episode in range(EPISODES):
 
-  # # B. Override the default init to always start the agent in a fixed state
-  # discrete_state = get_discrete_state(np.array([-0.4, 0]))
-  # env.env.state = np.array([-0.4, 0])
-
-  # Variable to indicate: Has the episode completed ?
-  done = False
-
-  # Init the episode reward to 0
-  episode_reward = 0
-
-  # Loop over all steps of this episode
-  while not done:
-
-    # A. Scheduled epsilon-greedy strategy
-    if np.random.random() > epsilon:
-      # [EXPLOIT]
-      # Choose the best action for
-      #   this particular discrete state
-      action = np.argmax(q_table[discrete_state])
+    # Rendering is expensive, don't render every episode,
+    #   only render every SHOW_EVERY'th episode
+    if episode % SHOW_EVERY == 0:
+      render = True
+      print(episode)
     else:
-      # [EXPLORE]
-      # Choose a random action
-      action = np.random.randint(0, env.action_space.n)
+      render = False
 
-    # # B. Always greedy strategy
-    # action = np.argmax(q_table[discrete_state])
+    # A. Default Init : places the agent in the env
+    #      at a random position and having random velocity
+    discrete_state = get_discrete_state(env.reset())
 
+    # A+B. Override the default init to always start the agent in a fixed state
+    discrete_state = get_discrete_state(np.array([-0.4, 0]))
+    env.env.state = np.array([-0.4, 0])
 
-    # Step the env to get:
-    #   a new state, a reward, an episode done status, etc.
-    new_state, reward, done, _ = env.step(action)
+    # Variable to indicate: Has the episode completed ?
+    done = False
 
-    # Accumulate reward for stats
-    episode_reward += reward
+    # Init the episode reward to 0
+    episode_reward = 0
 
-    # The env sent us to a new state, discretise the new_state
-    new_discrete_state = get_discrete_state(new_state)
+    # Loop over all steps of this episode
+    while not done:
 
-    # Render if it is the SHOW_EVERY'th episode
-    if render:
-      env.render()
+      # A. Scheduled epsilon-greedy strategy
+      if np.random.random() > epsilon:
+        # [EXPLOIT]
+        # Choose the best action for
+        #   this particular discrete state
+        action = np.argmax(q_table[discrete_state])
+      else:
+        # [EXPLORE]
+        # Choose a random action
+        action = np.random.randint(0, env.action_space.n)
 
-
-    # Determine the updated Q-value for (current state, chosen action)
-    # ----------------------------------------------------------------
-
-    # Unpack the new_state
-    pos, vel = new_state
-
-    # MountainCar did not reach the goal flag
-    if pos < env.goal_position:
-
-      # Current Q value for this particular state and the taken action
-      current_q = q_table[discrete_state + (action,)]
-
-      # Max possible Q value by actioning from the future state
-      max_future_q = np.max(q_table[new_discrete_state])
-
-      # Calculate the new Q value for this particular state and the taken action
-      # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
-      new_q = (1 - LEARNING_RATE) * current_q \
-            + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
-
-    # MountainCar made it to / past the goal flag !
-    else:
-      # We got the max possible reward (at any step) i.e. 0
-      new_q = 0
-
-    # Update the q_table
-    q_table[discrete_state + (action,)] = new_q
-
-    if done:
-      # Collect total total reward for this episode for stats
-      achieved_rewards.append(episode_reward)
+      # # B. Always greedy strategy
+      # action = np.argmax(q_table[discrete_state])
 
 
-    # Update the current state var to the newly acquired discrete state
-    discrete_state = new_discrete_state
+      # Step the env to get:
+      #   a new state, a reward, an episode done status, etc.
+      new_state, reward, done, _ = env.step(action)
+
+      # Accumulate reward for stats
+      episode_reward += reward
+
+      # The env sent us to a new state, discretise the new_state
+      new_discrete_state = get_discrete_state(new_state)
+
+      # Render if it is the SHOW_EVERY'th episode
+      if render:
+        env.render()
 
 
-  # Agg stats
-  if episode % STATS_EVERY == 0:
-    stats['ep'].append(episode)
-    min_ = np.min(achieved_rewards)
-    max_ = np.max(achieved_rewards)
-    avg_ = np.mean(achieved_rewards)
-    stats['min'].append(min_)
-    stats['max'].append(max_)
-    stats['avg'].append(avg_)
-    print(f"Stats: ep {episode} , min {min_} , max {max_} , avg {avg_}")
+      # Determine the updated Q-value for (current state, chosen action)
+      # ----------------------------------------------------------------
 
-  # Decay the epsilon
-  if START_EPSILON_DECAYING <= episode <= END_EPSILON_DECAYING:
-    epsilon -= episilon_decay_value
+      # Unpack the new_state
+      pos, vel = new_state
+
+      # MountainCar did not reach the goal flag
+      if pos < env.goal_position:
+
+        # Current Q value for this particular state and the taken action
+        current_q = q_table[discrete_state + (action,)]
+
+        # Max possible Q value by actioning from the future state
+        max_future_q = np.max(q_table[new_discrete_state])
+
+        # Calculate the new Q value for this particular state and the taken action
+        # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
+        new_q = (1 - LEARNING_RATE) * current_q \
+              + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
+
+      # MountainCar made it to / past the goal flag !
+      else:
+        # We got the max possible reward (at any step) i.e. 0
+        new_q = 0
+
+      # Update the q_table
+      q_table[discrete_state + (action,)] = new_q
+
+      if done:
+        # Collect total total reward for this episode for stats
+        achieved_rewards.append(episode_reward)
 
 
-# Close the gym env
-env.close()
+      # Update the current state var to the newly acquired discrete state
+      discrete_state = new_discrete_state
 
 
-# Viz stats
-plt.plot(stats['ep'], stats['min'], label='min rewards')
-plt.plot(stats['ep'], stats['max'], label='max rewards')
-plt.plot(stats['ep'], stats['avg'], label='avg rewards')
-plt.legend(loc=0)
-plt.show()
+    # Agg stats
+    if episode % STATS_EVERY == 0:
+      stats['ep'].append(episode)
+      min_ = np.min(achieved_rewards)
+      max_ = np.max(achieved_rewards)
+      avg_ = np.mean(achieved_rewards)
+      stats['min'].append(min_)
+      stats['max'].append(max_)
+      stats['avg'].append(avg_)
+      print(f"Stats: ep {episode} , min {min_} , max {max_} , avg {avg_}")
+
+    # Decay the epsilon
+    if START_EPSILON_DECAYING <= episode <= END_EPSILON_DECAYING:
+      epsilon -= episilon_decay_value
+
+
+  # Close the gym env
+  env.close()
+
+
+  # Viz stats
+  plt.plot(stats['ep'], stats['min'], label='min rewards')
+  plt.plot(stats['ep'], stats['max'], label='max rewards')
+  plt.plot(stats['ep'], stats['avg'], label='avg rewards')
+  plt.legend(loc=0)
+  plt.show()
