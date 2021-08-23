@@ -15,3 +15,6 @@ LowLearningRateExpt
 
 LowDiscountingExpt  
 ![LowDiscountingExpt](stats_LowDiscountingExpt.png)
+
+MedDiscountingExpt  
+![MedDiscountingExpt](stats_MedDiscountingExpt.png)
