@@ -6,13 +6,15 @@ from matplotlib import pyplot as plt
 
 class BaseExperiment(object):
   '''
-    Ref.: https://pythonprogramming.net/q-learning-reinforcement-learning-python-tutorial/
 
-
-    Notes:
+    Experiment to train a reinforcement-learning agent that learns using a table of Q-values.
+    Agent is a car. Goal is to climb the mountain and reach the flag.
+    Following is the set of actions:
       action = 0  # PUSH LEFT
       action = 1  # DO NOTHING
       action = 2  # PUSH RIGHT
+
+    Ref.: https://pythonprogramming.net/q-learning-reinforcement-learning-python-tutorial/
 
   '''
 
