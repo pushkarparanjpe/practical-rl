@@ -22,7 +22,7 @@ class BaseExperiment(object):
     # ----------
 
     # Settings for discret-ising (binning) the observed continuous state values
-    OBS_BIN_COUNTS = [20, 20]
+    OBS_BIN_COUNTS = [20, 20]  # State is 2-dimensional (position, velocity)
 
     # Settings for Q-Learning
     LEARNING_RATE = 0.1
