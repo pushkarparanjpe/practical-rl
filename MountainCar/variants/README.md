@@ -21,3 +21,6 @@ MedDiscountingExpt
 
 CoarseVelocityStateExpt  
 ![CoarseVelocityStateExpt](charts/stats_CoarseVelocityStateExpt.png)
+
+AlwaysGreedyStrategyExpt  
+![AlwaysGreedyStrategyExpt](charts/stats_AlwaysGreedyStrategyExpt.png)

@@ -76,6 +76,19 @@ class BaseExperiment(object):
         discrete_state = self.get_discrete_state(self.env.reset())
         return discrete_state
 
+    def choose_action(self, discrete_state):
+        # Scheduled epsilon-greedy strategy
+        if np.random.random() > self.epsilon:
+            # [EXPLOIT]
+            # Choose the best action for
+            #   this particular discrete state
+            action = np.argmax(self.q_table[discrete_state])
+        else:
+            # [EXPLORE]
+            # Choose a random action
+            action = np.random.randint(0, self.env.action_space.n)
+        return action
+
     def play_episode(self, episode):
         discrete_state = self.init_episode_state()
 
@@ -96,19 +109,8 @@ class BaseExperiment(object):
         # Loop over all steps of this episode
         while not done:
 
-            # A. Scheduled epsilon-greedy strategy
-            if np.random.random() > self.epsilon:
-                # [EXPLOIT]
-                # Choose the best action for
-                #   this particular discrete state
-                action = np.argmax(self.q_table[discrete_state])
-            else:
-                # [EXPLORE]
-                # Choose a random action
-                action = np.random.randint(0, self.env.action_space.n)
-
-            # # B. Always greedy strategy
-            # action = np.argmax(q_table[discrete_state])
+            # Choose an action
+            action = self.choose_action(discrete_state)
 
             # Step the env to get:
             #   a new state, a reward, an episode done status, etc.
