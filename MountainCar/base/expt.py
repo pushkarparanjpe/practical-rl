@@ -155,7 +155,6 @@ class BaseExperiment(object):
 
             # Render if it is the SHOW_EVERY'th episode
             if render:
-                print(episode)
                 self.env.render()
 
     def agg_stats(self, episode):
