@@ -111,7 +111,6 @@ class BaseExperiment(object):
 
         # Loop over all steps of this episode
         while not done:
-
             # Choose an action
             action = self.choose_action(discrete_state)
             # Step the env
@@ -119,13 +118,14 @@ class BaseExperiment(object):
             # Discret-ise the new state
             new_discrete_state = self.get_discrete_state(new_state)
 
-            # Determine the updated Q-value for (current state, chosen action)
-            # ----------------------------------------------------------------
+            # Update the Q-value for (current state, chosen action)
+            # -----------------------------------------------------------------
+
             # Unpack the new_state
             pos, vel = new_state
-            # MountainCar did not reach the goal flag
-            if pos < self.env.goal_position:
-                # Current Q value for this particular state and the taken action
+
+            if pos < self.env.goal_position:  # MountainCar did not reach the goal flag
+                # Current Q value for this particular (state, taken action)
                 current_q = self.q_table[discrete_state + (action,)]
                 # Max possible Q value by actioning from the future state
                 max_future_q = np.max(self.q_table[new_discrete_state])
@@ -133,21 +133,20 @@ class BaseExperiment(object):
                 # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
                 new_q = (1 - self.LEARNING_RATE) * current_q \
                         + self.LEARNING_RATE * (reward + self.DISCOUNT * max_future_q)
-            # MountainCar made it to / past the goal flag !
-            else:
+            else:                             # MountainCar made it to / past the goal flag !
                 # We got the max possible reward (at any step) i.e. 0
                 new_q = 0
-            # ----------------------------------------------------------------
 
             # Update the q_table
             self.q_table[discrete_state + (action,)] = new_q
+            # -----------------------------------------------------------------
 
             # Accumulate reward for stats
             episode_reward += reward
 
             # Did this episode complete ?
             if done:
-                # Collect total total reward for this episode for stats
+                # Collect total reward for this episode for stats
                 self.achieved_rewards.append(episode_reward)
 
             # Set new discrete state as the current discrete state
@@ -184,6 +183,7 @@ class BaseExperiment(object):
 
     def viz_stats(self):
         # Viz stats
+        plt.style.use('ggplot')
         plt.plot(self.stats['ep'], self.stats['min'], label='min rewards')
         plt.plot(self.stats['ep'], self.stats['max'], label='max rewards')
         plt.plot(self.stats['ep'], self.stats['avg'], label='avg rewards')
