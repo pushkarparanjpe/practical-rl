@@ -192,7 +192,7 @@ class BaseExperiment(object):
         plt.xlabel("episodes")
         plt.title(self.__class__.__name__)
         plt.legend(loc=0)
-        plt.savefig(f"stats_{self.__class__.__name__}", dpi=90)
+        plt.savefig(f"charts/stats_{self.__class__.__name__}", dpi=90)
         plt.show()
 
     def run(self):

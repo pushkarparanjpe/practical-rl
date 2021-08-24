@@ -1,20 +1,20 @@
 FixedInitStateExpt  
-![FixedInitStateExpt](stats_FixedInitStateExpt.png)
+![FixedInitStateExpt](charts/stats_FixedInitStateExpt.png)
 
 CoarseStatesExpt  
-![CoarseStatesExpt](stats_CoarseStatesExpt.png)
+![CoarseStatesExpt](charts/stats_CoarseStatesExpt.png)
 
 GranularStatesExpt  
-![GranularStatesExpt](stats_GranularStatesExpt.png)
+![GranularStatesExpt](charts/stats_GranularStatesExpt.png)
 
 HighLearningRateExpt  
-![HighLearningRateExpt](stats_HighLearningRateExpt.png)
+![HighLearningRateExpt](charts/stats_HighLearningRateExpt.png)
 
 LowLearningRateExpt  
-![LowLearningRateExpt](stats_LowLearningRateExpt.png)
+![LowLearningRateExpt](charts/stats_LowLearningRateExpt.png)
 
 LowDiscountingExpt  
-![LowDiscountingExpt](stats_LowDiscountingExpt.png)
+![LowDiscountingExpt](charts/stats_LowDiscountingExpt.png)
 
 MedDiscountingExpt  
-![MedDiscountingExpt](stats_MedDiscountingExpt.png)
+![MedDiscountingExpt](charts/stats_MedDiscountingExpt.png)

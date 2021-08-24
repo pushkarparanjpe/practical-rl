@@ -1,2 +1,2 @@
 BaseExperiment  
-![BaseExperiment](stats_BaseExperiment.png)
+![BaseExperiment](charts/stats_BaseExperiment.png)
