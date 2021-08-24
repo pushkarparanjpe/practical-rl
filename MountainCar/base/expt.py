@@ -89,6 +89,15 @@ class BaseExperiment(object):
             action = np.random.randint(0, self.env.action_space.n)
         return action
 
+    def do_scheduled_epsilon_update(self, episode):
+        # Decay the epsilon according to the schedule
+        if self.START_EPSILON_DECAYING <= episode <= self.END_EPSILON_DECAYING:
+            self.epsilon -= self.EPSILON_DECAY_VALUE
+
+    def do_scheduled_learning_rate_update(self, episode):
+        # TODO : impl update to learning_rate
+        pass
+
     def play_episode(self, episode):
         discrete_state = self.init_episode_state()
 
@@ -175,9 +184,10 @@ class BaseExperiment(object):
     def train(self):
         # Loop over all episodes
         for episode in range(self.EPISODES):
-            # Decay the epsilon
-            if self.START_EPSILON_DECAYING <= episode <= self.END_EPSILON_DECAYING:
-                self.epsilon -= self.EPSILON_DECAY_VALUE
+            # Update epsilon
+            self.do_scheduled_epsilon_update(episode)
+            # Update learning rate
+            self.do_scheduled_learning_rate_update(episode)
             # Run the intra-episode loop
             self.play_episode(episode)
             # Agg stats
