@@ -18,3 +18,6 @@ LowDiscountingExpt
 
 MedDiscountingExpt  
 ![MedDiscountingExpt](charts/stats_MedDiscountingExpt.png)
+
+CoarseVelocityStateExpt  
+![CoarseVelocityStateExpt](charts/stats_CoarseVelocityStateExpt.png)
