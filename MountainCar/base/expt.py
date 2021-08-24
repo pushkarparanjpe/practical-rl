@@ -21,17 +21,13 @@ class BaseExperiment(object):
     # Settings :
     # ----------
 
-    # Settings for discreti-sing the observed continuous state values
-    DISCRETE_BUCKET_SIZES = [20, 20]
+    # Settings for discret-ising (binning) the observed continuous state values
+    OBS_BIN_COUNTS = [20, 20]
 
     # Settings for Q-Learning
     LEARNING_RATE = 0.1
     DISCOUNT = 0.95
     EPISODES = 10_000
-
-    # Settings for rendering, stats
-    SHOW_EVERY = 1000
-    STATS_EVERY = 100
 
     # Settings for exploration
     # In initial episodes, epsilon has a high value --> low probability greedy-action-selection
@@ -39,11 +35,10 @@ class BaseExperiment(object):
     epsilon = 1
     START_EPSILON_DECAYING = 1
     END_EPSILON_DECAYING = EPISODES // 2
-    EPSILON_DECAY_VALUE = epsilon \
-                          / (
-                                  END_EPSILON_DECAYING
-                                  - START_EPSILON_DECAYING
-                          )
+
+    # Settings for rendering, stats
+    SHOW_EVERY = 1000
+    STATS_EVERY = 100
 
     def __init__(self):
 
@@ -53,17 +48,18 @@ class BaseExperiment(object):
         print("LOW", self.env.observation_space.low)
         print("n actions", self.env.action_space.n)
 
-        self.DISCRETE_WINDOW_SIZES = (
-                                             self.env.observation_space.high - self.env.observation_space.low
-                                     ) / self.DISCRETE_BUCKET_SIZES
-        print("OBS BUCKETS WINDOW SIZES", self.DISCRETE_WINDOW_SIZES)
+        self.OBS_BIN_WIDTHS = (self.env.observation_space.high - self.env.observation_space.low) / self.OBS_BIN_COUNTS
+        print("OBS BUCKETS BIN WIDTHS", self.OBS_BIN_WIDTHS)
 
         # Randomly init the Q-table
         self.q_table = np.random.uniform(
             low=-2, high=0,
-            size=(*self.DISCRETE_BUCKET_SIZES, self.env.action_space.n)
+            size=(*self.OBS_BIN_COUNTS, self.env.action_space.n)
         )
         print("Q Table shape: ", self.q_table.shape)
+
+        # Settings for exploration
+        self.EPSILON_DECAY_VALUE = self.epsilon / (self.END_EPSILON_DECAYING - self.START_EPSILON_DECAYING)
 
         # Accessories for stats
         self.achieved_rewards = deque(maxlen=self.STATS_EVERY)
@@ -71,9 +67,7 @@ class BaseExperiment(object):
 
     # Helper function that discreti-ses continuous state values to discrete values
     def get_discrete_state(self, state):
-        discrete_state = (
-                                 state - self.env.observation_space.low
-                         ) / self.DISCRETE_WINDOW_SIZES
+        discrete_state = (state - self.env.observation_space.low) / self.OBS_BIN_WIDTHS
         return tuple(discrete_state.astype(np.int32))
 
     def init_episode_state(self):
@@ -82,8 +76,7 @@ class BaseExperiment(object):
         discrete_state = self.get_discrete_state(self.env.reset())
         return discrete_state
 
-    def loop_over_steps(self, episode):
-
+    def play_episode(self, episode):
         discrete_state = self.init_episode_state()
 
         # Rendering is expensive, don't render every episode,
@@ -166,7 +159,7 @@ class BaseExperiment(object):
             # Update the current state var to the newly acquired discrete state
             discrete_state = new_discrete_state
 
-    def loop_over_episodes(self):
+    def train(self):
         # Loop over all episodes
         for episode in range(self.EPISODES):
             # Decay the epsilon
@@ -174,7 +167,7 @@ class BaseExperiment(object):
                 self.epsilon -= self.EPSILON_DECAY_VALUE
 
             # Run the intra-episode loop
-            self.loop_over_steps(episode)
+            self.play_episode(episode)
 
             # Agg stats
             if episode % self.STATS_EVERY == 0:
@@ -203,7 +196,7 @@ class BaseExperiment(object):
         plt.show()
 
     def run(self):
-        self.loop_over_episodes()
+        self.train()
         self.viz_stats()
 
 
