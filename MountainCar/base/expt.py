@@ -99,76 +99,64 @@ class BaseExperiment(object):
         pass
 
     def play_episode(self, episode):
+        # Acquire the initial state for this episode
         discrete_state = self.init_episode_state()
-
-        # Rendering is expensive, don't render every episode,
-        #   only render every SHOW_EVERY'th episode
-        if episode % self.SHOW_EVERY == 0:
-            render = True
-            print(episode)
-        else:
-            render = False
-
         # Variable to indicate: Has the episode completed ?
         done = False
-
         # Init the episode reward to 0
         episode_reward = 0
+
+        # Render SHOW_EVERY'th episode only
+        render = True if (episode % self.SHOW_EVERY == 0) else False
 
         # Loop over all steps of this episode
         while not done:
 
             # Choose an action
             action = self.choose_action(discrete_state)
-
-            # Step the env to get:
-            #   a new state, a reward, an episode done status, etc.
+            # Step the env
             new_state, reward, done, _ = self.env.step(action)
-
             # Discret-ise the new state
             new_discrete_state = self.get_discrete_state(new_state)
 
-            # Render if it is the SHOW_EVERY'th episode
-            if render:
-                self.env.render()
-
-            # Accumulate reward for stats
-            episode_reward += reward
-
             # Determine the updated Q-value for (current state, chosen action)
             # ----------------------------------------------------------------
-
             # Unpack the new_state
             pos, vel = new_state
-
             # MountainCar did not reach the goal flag
             if pos < self.env.goal_position:
-
                 # Current Q value for this particular state and the taken action
                 current_q = self.q_table[discrete_state + (action,)]
-
                 # Max possible Q value by actioning from the future state
                 max_future_q = np.max(self.q_table[new_discrete_state])
-
-                # Calculate the new Q value for this particular state and the taken action
+                # Calculate the new Q value for this particular (state, taken action)
                 # Ref.: https://pythonprogramming.net/static/images/reinforcement-learning/new-q-value-formula.png
                 new_q = (1 - self.LEARNING_RATE) * current_q \
                         + self.LEARNING_RATE * (reward + self.DISCOUNT * max_future_q)
-
             # MountainCar made it to / past the goal flag !
             else:
                 # We got the max possible reward (at any step) i.e. 0
                 new_q = 0
+            # ----------------------------------------------------------------
 
             # Update the q_table
             self.q_table[discrete_state + (action,)] = new_q
 
+            # Accumulate reward for stats
+            episode_reward += reward
+
+            # Did this episode complete ?
             if done:
                 # Collect total total reward for this episode for stats
                 self.achieved_rewards.append(episode_reward)
 
-            # Update the current state var to the newly acquired discrete state
+            # Set new discrete state as the current discrete state
             discrete_state = new_discrete_state
+
+            # Render if it is the SHOW_EVERY'th episode
+            if render:
+                print(episode)
+                self.env.render()
 
     def agg_stats(self, episode):
         if episode % self.STATS_EVERY == 0:
