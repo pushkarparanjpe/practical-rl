@@ -116,15 +116,15 @@ class BaseExperiment(object):
             #   a new state, a reward, an episode done status, etc.
             new_state, reward, done, _ = self.env.step(action)
 
-            # Accumulate reward for stats
-            episode_reward += reward
-
-            # The env sent us to a new state, discretise the new_state
+            # Discret-ise the new state
             new_discrete_state = self.get_discrete_state(new_state)
 
             # Render if it is the SHOW_EVERY'th episode
             if render:
                 self.env.render()
+
+            # Accumulate reward for stats
+            episode_reward += reward
 
             # Determine the updated Q-value for (current state, chosen action)
             # ----------------------------------------------------------------
@@ -161,27 +161,27 @@ class BaseExperiment(object):
             # Update the current state var to the newly acquired discrete state
             discrete_state = new_discrete_state
 
+    def agg_stats(self, episode):
+        if episode % self.STATS_EVERY == 0:
+            self.stats['ep'].append(episode)
+            min_ = np.min(self.achieved_rewards)
+            max_ = np.max(self.achieved_rewards)
+            avg_ = np.mean(self.achieved_rewards)
+            self.stats['min'].append(min_)
+            self.stats['max'].append(max_)
+            self.stats['avg'].append(avg_)
+            print(f"Stats: ep {episode} , min {min_} , max {max_} , avg {avg_}")
+
     def train(self):
         # Loop over all episodes
         for episode in range(self.EPISODES):
             # Decay the epsilon
             if self.START_EPSILON_DECAYING <= episode <= self.END_EPSILON_DECAYING:
                 self.epsilon -= self.EPSILON_DECAY_VALUE
-
             # Run the intra-episode loop
             self.play_episode(episode)
-
             # Agg stats
-            if episode % self.STATS_EVERY == 0:
-                self.stats['ep'].append(episode)
-                min_ = np.min(self.achieved_rewards)
-                max_ = np.max(self.achieved_rewards)
-                avg_ = np.mean(self.achieved_rewards)
-                self.stats['min'].append(min_)
-                self.stats['max'].append(max_)
-                self.stats['avg'].append(avg_)
-                print(f"Stats: ep {episode} , min {min_} , max {max_} , avg {avg_}")
-
+            self.agg_stats(episode)
         # Close the gym env
         self.env.close()
 
